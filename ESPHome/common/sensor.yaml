@@ -1,0 +1,14 @@
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    id: wifistrength
+    internal: true
+    update_interval: 60s
+    
+  - platform: template
+    name: Recorded Display Refresh
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshes"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
+    lambda: 'return id(recorded_display_refresh);'

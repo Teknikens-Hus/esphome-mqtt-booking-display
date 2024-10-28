@@ -1,0 +1,178 @@
+substitutions:
+  name: change-me
+  eventsTopic: change-me2
+
+<<: !include ./common/esphome.yaml
+
+## The board to use
+esp32:
+  board: nodemcu-32s
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    light: ERROR
+
+## Include shared functionallity
+<<: !include ./common/binary_sensor.yaml
+<<: !include ./common/button.yaml
+<<: !include ./common/connections.yaml
+<<: !include ./common/globals.yaml
+<<: !include ./common/sensor.yaml
+<<: !include ./common/text_sensor.yaml
+<<: !include ./common/time.yaml
+<<: !include ./common/scripts.yaml
+<<: !include ./common/lights.yaml
+
+## The below is specific for the e-paper display.
+spi:
+  clk_pin: GPIO22
+  mosi_pin: GPIO23
+
+# 800 x 480 pixels
+display:
+  - platform: waveshare_epaper
+    id: displayid
+    cs_pin: GPIO19
+    dc_pin: GPIO18
+    reset_duration: 2ms
+    busy_pin:
+      number: GPIO16
+      inverted: false
+    reset_pin: GPIO17
+    model: 7.50inV2
+    #full_update_every: 30
+    update_interval: never
+    pages:
+      - id: page1
+        lambda: |-
+          // Get the screen dimensions
+          auto screenX = it.get_width();
+          auto screenY = it.get_height();
+          ESP_LOGD("DISPLAY", "Screen dimensions: %dx%d", screenX, screenY);
+
+          int h1Size = 80;
+          int h2Size = 55;
+          int h3Size = 40;
+
+          std::string name = "${name}";
+
+          int edgePadding = 20;
+          int intentPixels = 20;
+
+          // Fill background
+          it.fill(COLOR_ON);
+
+          // Show loading screen before data is received.
+          int yPosition = edgePadding;
+          // Print the room name:
+          it.printf(edgePadding, yPosition, id(h1_semi_bold), COLOR_OFF, name.c_str());
+          //¨
+          yPosition += h1Size;
+          // Print the date to the right of the room name:
+          it.strftime(edgePadding, yPosition, id(h3), COLOR_OFF, "%d/%m %Y", id(esptime).now());
+          //
+
+          int lineThickness = 4;
+          yPosition += h3Size + edgePadding; // 10 pixels between the date and the line
+          // Draw line under the room name and date: Coords are X Y then size X Y 
+          it.filled_rectangle(0, yPosition, screenX, lineThickness, COLOR_OFF);
+          yPosition += edgePadding;
+
+          if (id(initial_data_received) == false) {
+            it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "WAITING FOR DATA...");
+            ESP_LOGD("DISPLAY", "Waiting for data...");
+            return;
+          } else {
+
+            auto now = id(esptime).now();
+            int current_hour = now.hour;
+            int current_minute = now.minute;
+
+            std::string jsonString = id(calevents).state;
+            DynamicJsonDocument doc(1024);
+            auto error = deserializeJson(doc, jsonString);
+
+            if (error) {
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "ERROR PARSING JSON");
+              return;
+            }
+
+            JsonArray bookings = doc.as<JsonArray>();
+            
+            // From here the bookings are filtered and only the upcoming ones are left.
+            if(bookings.size() == 0) {
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "No bookings today!");
+              ESP_LOGD("DISPLAY", "No upcoming events");
+            } else {
+              ESP_LOGD("DISPLAY", "Filtered bookings found %d", bookings.size());
+              for (size_t i = 0; i < bookings.size() && i < 4; ++i) {
+                JsonObject booking = bookings[i];
+                std::string summary = booking["summary"].as<std::string>();
+                std::string start = booking["start"].as<std::string>();
+                std::string end = booking["end"].as<std::string>();
+
+                if (i == 0) {
+                  // Print the first booking name:
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, summary.c_str());
+                  yPosition += h2Size;
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, (start + " - " + end).c_str());
+                  yPosition += h2Size;
+                } else {
+                  // Print the rest of the bookings:
+                  yPosition += h2Size;
+                  it.printf(edgePadding + intentPixels, yPosition, id(h3_semi_bold), COLOR_OFF, ("- " + start + " - " + end + " " + summary).c_str());
+                }
+              }
+            }
+          }
+
+font:
+  # Regular fonts
+  - file: "gfonts://Roboto"
+    id: h1
+    size: 80
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"
+  - file: "gfonts://Roboto"
+    id: h2
+    size: 55
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"
+  - file: "gfonts://Roboto"
+    id: h3
+    size: 40
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"
+  # Light Fonts
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h1_semi_bold
+    size: 80
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h2_semi_bold
+    size: 55
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h3_semi_bold
+    size: 40
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöá"

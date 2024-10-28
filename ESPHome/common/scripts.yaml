@@ -1,0 +1,31 @@
+script:
+  - id: update_screen
+    then:
+      - if:
+          condition:
+            lambda: return (id(initial_data_received) == false);
+          then:
+            - logger.log: "Initial data received"
+            - light.turn_on:
+                id: occupied_light
+                red: 50%
+                green: 50%
+                blue: 50%
+                effect: "none"
+            - delay: 2s
+            - lambda: id(initial_data_received) = true;
+      - script.execute: actual_update
+      
+  - id: actual_update
+    mode: restart
+    then:
+      - delay: 5s
+      - logger.log: "Updating screen..."
+      - lambda: id(recorded_display_refresh) += 1;
+      - lambda: |-
+          auto now = id(esptime).now();
+          ESP_LOGD("DISPLAY", "Updating screen at %02d:%02d", now.hour, now.minute);
+          char buffer[32];
+          now.strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%SZ");
+          id(display_last_update).publish_state(buffer);
+      - component.update: displayid

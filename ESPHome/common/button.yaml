@@ -1,0 +1,12 @@
+button:
+  - platform: shutdown
+    name: Shutdown
+
+  - platform: restart
+    name: Restart
+
+  - platform: template
+    name: Refresh Screen
+    entity_category: config
+    on_press:
+      - script.execute: update_screen

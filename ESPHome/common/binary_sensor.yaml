@@ -1,0 +1,59 @@
+binary_sensor:
+  - platform: template
+    name: "Occupied"
+    device_class: occupancy
+    icon: mdi:calendar-clock
+    on_press:
+      - light.turn_on:
+          id: occupied_light
+          red: 100%
+          green: 0%
+          blue: 0%
+          effect: "none"
+    on_release:
+      - light.turn_on:
+          id: occupied_light
+          red: 0%
+          green: 100%
+          blue: 0%
+          effect: "none"
+      - logger.log: "Not occupied"
+    lambda: |-
+      std::string jsonString = id(calevents).state;
+      if(jsonString.empty()) {
+        return false;
+      }
+      DynamicJsonDocument doc(1024);
+      auto error = deserializeJson(doc, jsonString);
+      if (error) {
+        ESP_LOGD("Occupied", "Error parsing JSON");
+        return false;
+      }
+
+      JsonArray bookings = doc.as<JsonArray>();
+      if (bookings.size() == 0) {
+        return false;
+      } else {
+        auto now = id(esptime).now();
+        int current_hour = now.hour;
+        int current_minute = now.minute;
+
+        for (size_t i = 0; i < bookings.size(); ++i) {
+          JsonObject booking = bookings[i];
+          std::string summary = booking["summary"].as<std::string>();
+          std::string start = booking["start"].as<std::string>();
+          std::string end = booking["end"].as<std::string>();
+
+          int start_hour = atoi(start.substr(0, 2).c_str());
+          int start_minute = atoi(start.substr(3, 2).c_str());
+          int end_hour = atoi(end.substr(0, 2).c_str());
+          int end_minute = atoi(end.substr(3, 2).c_str());
+
+          bool is_after_start = (current_hour > start_hour) || (current_hour == start_hour && current_minute >= start_minute);
+          bool is_before_end = (current_hour < end_hour) || (current_hour == end_hour && current_minute <= end_minute);
+          if (is_after_start && is_before_end) {
+            return true;
+          }
+        }
+        return false;
+      }

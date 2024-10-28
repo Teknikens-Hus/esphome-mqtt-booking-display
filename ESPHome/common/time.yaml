@@ -1,0 +1,4 @@
+time:
+  - platform: sntp
+    timezone: !secret timezone
+    id: esptime
