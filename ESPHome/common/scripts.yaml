@@ -1,4 +1,57 @@
 script:
+  - id: data_received
+    then:
+      if:
+        condition:
+          lambda: return id(calevents).state != id(last_message).state;
+        then:
+          - logger.log: "New data received"
+          - text_sensor.template.publish:
+              id: last_message
+              state: !lambda 'return id(calevents).state;'
+          - text_sensor.template.publish:
+              id: index0_start_time
+              state: !lambda |-
+                std::string jsonString = id(calevents).state;
+                if (jsonString.empty()) {
+                  return "None";
+                }
+                DynamicJsonDocument doc(1024);
+                auto error = deserializeJson(doc, jsonString);
+                if (error) {
+                  ESP_LOGD("Start Time", "Error parsing JSON");
+                  return "Error";
+                }
+                JsonArray bookings = doc.as<JsonArray>();
+                if (bookings.size() == 0) {
+                  return "None";
+                } else {
+                  JsonObject first_booking = bookings[0];
+                  std::string start = first_booking["start"].as<std::string>();
+                  return start;
+                }
+          - text_sensor.template.publish:
+              id: index0_end_time
+              state: !lambda |-
+                std::string jsonString = id(calevents).state;
+                if (jsonString.empty()) {
+                  return "None";
+                }
+                DynamicJsonDocument doc(1024);
+                auto error = deserializeJson(doc, jsonString);
+                if (error) {
+                  ESP_LOGD("End Time", "Error parsing JSON");
+                  return "Error";
+                }
+                JsonArray bookings = doc.as<JsonArray>();
+                if (bookings.size() == 0) {
+                  return "None";
+                } else {
+                  JsonObject first_booking = bookings[0];
+                  std::string end = first_booking["end"].as<std::string>();
+                  return end;
+                }
+          - script.execute: update_screen
   - id: update_screen
     then:
       - if:
@@ -13,19 +66,65 @@ script:
                 blue: 50%
                 effect: "none"
             - delay: 2s
+            - script.execute: update_occupied_light
             - lambda: id(initial_data_received) = true;
       - script.execute: actual_update
       
   - id: actual_update
     mode: restart
     then:
-      - delay: 5s
       - logger.log: "Updating screen..."
       - lambda: id(recorded_display_refresh) += 1;
-      - lambda: |-
-          auto now = id(esptime).now();
-          ESP_LOGD("DISPLAY", "Updating screen at %02d:%02d", now.hour, now.minute);
-          char buffer[32];
-          now.strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%SZ");
-          id(display_last_update).publish_state(buffer);
+      #- lambda: |-
+      #    char buffer[17];
+      #    time_t currTime = id(esptime).now().timestamp;
+      #    strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M", localtime(&currTime));
+      #    id(display_last_update).publish_state(buffer);
+      - component.update: display_last_update
       - component.update: displayid
+  
+  - id: not_occupied
+    then:
+      - logger.log: "Not occupied"
+      - light.turn_on:
+          id: occupied_light
+          red: 0%
+          green: 100%
+          blue: 0%
+          effect: "none"
+  
+  - id: occupied
+    then:
+      - logger.log: "Occupied!"
+      - light.turn_on:
+          id: occupied_light
+          red: 100%
+          green: 0%
+          blue: 0%
+          effect: "none"
+  
+  - id: occupied_soon
+    then:
+      - logger.log: "Soon occupied"
+      - light.turn_on:
+          id: occupied_light
+          red: 100%
+          green: 100%
+          blue: 0%
+          effect: "Pulse"
+
+  - id: update_occupied_light
+    then:
+      - if:
+          condition:
+            lambda: return id(b_occupied).state;
+          then:
+            - script.execute: occupied
+          else:
+            - if:
+                condition:
+                  lambda: return id(b_occupied_soon).state;
+                then:
+                  - script.execute: occupied_soon
+                else:
+                  - script.execute: not_occupied

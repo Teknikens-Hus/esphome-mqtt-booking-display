@@ -1,8 +1,8 @@
 globals:
-  - id: data_updated
-    type: bool
-    restore_value: no
-    initial_value: 'false'
+#  - id: data_updated
+#    type: bool
+#    restore_value: no
+#    initial_value: 'false'
   - id: initial_data_received
     type: bool
     restore_value: no

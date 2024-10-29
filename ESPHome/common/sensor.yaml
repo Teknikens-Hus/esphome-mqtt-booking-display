@@ -2,8 +2,9 @@ sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
     id: wifistrength
-    internal: true
-    update_interval: 60s
+    icon: mdi:wifi-strength-2
+    internal: false
+    update_interval: 120s
     
   - platform: template
     name: Recorded Display Refresh
@@ -11,4 +12,5 @@ sensor:
     unit_of_measurement: "Refreshes"
     state_class: "total_increasing"
     entity_category: "diagnostic"
+    icon: mdi:counter
     lambda: 'return id(recorded_display_refresh);'

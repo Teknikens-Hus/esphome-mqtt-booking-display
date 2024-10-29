@@ -11,6 +11,7 @@ wifi:
     password: !secret ota_password
 
 web_server:
+  version: 3
   include_internal: True
 
 mqtt:

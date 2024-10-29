@@ -2,13 +2,26 @@ light:
   - platform: esp32_rmt_led_strip
     rgb_order: GRB
     pin: GPIO27
-    num_leds: 28
+    num_leds: 12
     rmt_channel: 0
     chipset: WS2812
     name: "Occupied Light"
     id: occupied_light
+    icon: mdi:television-ambient-light
+    internal: true
+    default_transition_length: 2s
+    web_server:
+      sorting_weight: 6
     effects:
       - addressable_scan:
           name: Scan
           move_interval: 50ms
-          scan_width: 3
+          scan_width: 2
+      - pulse:
+          name: Pulse
+          update_interval: 10s
+          min_brightness: 40%
+          max_brightness: 100%
+          transition_length:
+            on_length: 9s
+            off_length: 9s

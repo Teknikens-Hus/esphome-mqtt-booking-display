@@ -7,6 +7,7 @@ button:
 
   - platform: template
     name: Refresh Screen
+    icon: mdi:refresh
     entity_category: config
     on_press:
       - script.execute: update_screen

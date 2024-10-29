@@ -2,3 +2,10 @@ time:
   - platform: sntp
     timezone: !secret timezone
     id: esptime
+    # Update the screen every day. This makes sure the date is correct if nothing else updates it for a day.
+    on_time:
+      - hours: 1
+        minutes: 00
+        seconds: 00
+        then:
+          - script.execute: update_screen
