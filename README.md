@@ -2,8 +2,11 @@
 This is a project linked to [calendar-to-mqtt](https://github.com/Teknikens-Hus/calendar-to-mqtt) that takes the events published and displays them on a screen
 
 ## To install/setup/update:
+#### NOTE
+Make sure you install Python 3.10.1. Using the latest version might not be supported. 
 - Make sure you've installed Python and [ESPHome CLI](https://esphome.io/guides/installing_esphome)
-- Run the main.py file using Python.
+- install pillow with: ```pip install pillow==10.2.0``` (might fail if you have too new version of python)
+- Run the main.py file using Python. ```python ./AutoScript/main.py```
 
 The main.py file will:
  - Help you install new ESP32 devices
