@@ -38,19 +38,19 @@ font:
     size: 80
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
   - file: "gfonts://Roboto"
     id: h2
     size: 55
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
   - file: "gfonts://Roboto"
     id: h3
     size: 40
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
   # Light Fonts
   - file:
       type: gfonts
@@ -60,7 +60,7 @@ font:
     size: 80
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
   - file:
       type: gfonts
       family: Roboto
@@ -69,7 +69,7 @@ font:
     size: 55
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
   - file:
       type: gfonts
       family: Roboto
@@ -78,7 +78,7 @@ font:
     size: 40
     extras:
       file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöá"
+      glyphs: "ÅÄÖåäöÁÉáé"
 
 # 800 x 480 pixels
 display:
