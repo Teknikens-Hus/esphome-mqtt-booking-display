@@ -69,3 +69,10 @@ binary_sensor:
       int minutes_until_start = start_total_minutes - current_total_minutes;
 
       return minutes_until_start > 0 && minutes_until_start <= 15;
+
+  - platform: template
+    name: "MQTT Connected"
+    id: b_mqtt_connected
+    device_class: occupancy
+    icon: mdi:connection
+    entity_category: "diagnostic"

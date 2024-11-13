@@ -9,14 +9,36 @@ light:
     id: occupied_light
     icon: mdi:television-ambient-light
     internal: true
-    default_transition_length: 2s
+    default_transition_length: 1s
+    #color_correct: [50%, 50%, 50%] 
     web_server:
       sorting_weight: 6
     effects:
       - addressable_scan:
-          name: Scan
+          name: Scan_old
           move_interval: 50ms
           scan_width: 2
+      - addressable_lambda:
+          name: Scan
+          update_interval: 50ms
+          lambda: |-
+            static int position = 0;
+            static const int segment_length = 5; // Number of LEDs in the moving segment
+
+            // Turn off all LEDs
+            for(int index = 0; index < it.size(); index++) {
+              it[index].set({ 0, 0, 0 });
+            }
+
+            // Turn on the segment of LEDs
+            for (int i = 0; i < segment_length; i++) {
+              int led_index = (position + i) % it.size();
+              //call.set_rgb(1.0, 1.0, 1.0); // Change this to the desired color
+              it[led_index].set({ 0, 0, 128 });
+            }
+
+            // Move the position
+            position = (position + 1) % it.size();
       - pulse:
           name: Pulse
           update_interval: 10s

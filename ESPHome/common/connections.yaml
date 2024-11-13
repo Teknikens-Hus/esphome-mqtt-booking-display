@@ -18,5 +18,15 @@ mqtt:
   broker: !secret broker_ip
   username: !secret mqtt_username
   password: !secret mqtt_password
+  on_connect: 
+    then:
+      binary_sensor.template.publish:
+        id: b_mqtt_connected
+        state: ON
+  on_disconnect:
+    then:
+      binary_sensor.template.publish:
+        id: b_mqtt_connected
+        state: OFF
 
 captive_portal:

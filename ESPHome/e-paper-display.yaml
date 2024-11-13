@@ -86,7 +86,7 @@ display:
     id: displayid
     cs_pin: GPIO19
     dc_pin: GPIO18
-    reset_duration: 2ms
+    reset_duration: 20ms
     busy_pin:
       number: GPIO16
       inverted: false
