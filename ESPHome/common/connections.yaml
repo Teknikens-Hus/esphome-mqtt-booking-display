@@ -18,6 +18,7 @@ mqtt:
   broker: !secret broker_ip
   username: !secret mqtt_username
   password: !secret mqtt_password
+  discovery_unique_id_generator: mac
   on_connect: 
     then:
       binary_sensor.template.publish:
