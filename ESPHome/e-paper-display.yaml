@@ -47,7 +47,7 @@ font:
       glyphs: "ÅÄÖåäöÁÉáé"
   - file: "gfonts://Roboto"
     id: h3
-    size: 40
+    size: 35
     extras:
       file: "gfonts://Roboto"
       glyphs: "ÅÄÖåäöÁÉáé"
@@ -75,7 +75,7 @@ font:
       family: Roboto
       weight: bold
     id: h3_semi_bold
-    size: 40
+    size: 35
     extras:
       file: "gfonts://Roboto"
       glyphs: "ÅÄÖåäöÁÉáé"
@@ -91,7 +91,7 @@ display:
       number: GPIO16
       inverted: false
     reset_pin: GPIO17
-    model: 7.50inV2
+    model: 7.50inV2alt
     #full_update_every: 30
     update_interval: never
     pages:
@@ -104,7 +104,7 @@ display:
           // These should match the font sizes in the font definition above
           int h1Size = 80;
           int h2Size = 55;
-          int h3Size = 40;
+          int h3Size = 35;
 
           int edgePadding = 20;
           int intentPixels = 20;
