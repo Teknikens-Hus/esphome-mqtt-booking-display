@@ -116,25 +116,27 @@ display:
           }
 
           // Fill background
-          it.fill(COLOR_ON);
+          //it.fill(COLOR_ON);
+
+          Color TextColor = COLOR_ON;
 
           // Show loading screen before data is received.
           int yPosition = edgePadding;
           // Print the room name:
-          it.printf(edgePadding, yPosition, id(h1_semi_bold), COLOR_OFF, name.c_str());
+          it.printf(edgePadding, yPosition, id(h1_semi_bold), TextColor, name.c_str());
           //
           yPosition += h1Size;
           // Print the date to the right of the room name:
-          it.strftime(edgePadding, yPosition, id(h3), COLOR_OFF, "%d/%m %Y", id(esptime).now());
+          it.strftime(edgePadding, yPosition, id(h3), TextColor, "%d/%m %Y", id(esptime).now());
           //
           int lineThickness = 4;
           yPosition += h3Size + edgePadding; // 10 pixels between the date and the line
           // Draw line under the room name and date: Coords are X Y then size X Y 
-          it.filled_rectangle(0, yPosition, screenX, lineThickness, COLOR_OFF);
+          it.filled_rectangle(0, yPosition, screenX, lineThickness, TextColor);
           yPosition += edgePadding;
 
           if (id(initial_data_received) == false) {
-            it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "WAITING FOR DATA...");
+            it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "WAITING FOR DATA...");
             ESP_LOGD("DISPLAY", "Waiting for data...");
             return;
           } else {
@@ -144,7 +146,7 @@ display:
             auto error = deserializeJson(doc, jsonString);
 
             if (error) {
-              it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "ERROR PARSING JSON");
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "ERROR PARSING JSON");
               return;
             }
 
@@ -152,7 +154,7 @@ display:
             
             // From here the bookings are filtered and only the upcoming ones are left.
             if(bookings.size() == 0) {
-              it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, "No bookings today!");
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "No bookings today!");
               ESP_LOGD("DISPLAY", "No upcoming events");
             } else {
               //ESP_LOGD("DISPLAY", "Filtered bookings found %d", bookings.size());
@@ -163,14 +165,14 @@ display:
                 std::string end = booking["end"].as<std::string>();
                 if (i == 0) {
                   // Print the first booking name:
-                  it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, summary.c_str());
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, summary.c_str());
                   yPosition += h2Size;
-                  it.printf(edgePadding, yPosition, id(h2_semi_bold), COLOR_OFF, (start + " - " + end).c_str());
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, (start + " - " + end).c_str());
                   yPosition += h2Size;
                 } else {
                   // Print the rest of the bookings:
                   yPosition += h2Size;
-                  it.printf(edgePadding + intentPixels, yPosition, id(h3_semi_bold), COLOR_OFF, ("- " + start + " - " + end + " " + summary).c_str());
+                  it.printf(edgePadding + intentPixels, yPosition, id(h3_semi_bold), TextColor, ("- " + start + " - " + end + " " + summary).c_str());
                 }
               }
             }
