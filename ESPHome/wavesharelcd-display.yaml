@@ -1,0 +1,306 @@
+substitutions:
+  name: change-me
+  eventsTopic: change-me2
+
+esphome:
+  name: ${name}-booking-display
+  platformio_options:
+    build_flags: "-DBOARD_HAS_PSRAM"
+    board_build.arduino.memory_type: qio_opi
+    board_build.flash_mode: dio
+    board_upload.maximum_ram_size: 524288
+  on_boot:
+    - priority: 250
+      then:
+        #- light.turn_on:
+        #    id: occupied_light
+        #    red: 0%
+        #    green: 0%
+        #    blue: 80%
+        #    effect: Scan
+        - logger.log: "Booting up..."
+        - script.execute: actual_update
+
+psram:
+  mode: octal
+  speed: 120MHz
+
+## The board to use
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: ESP32S3
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      COMPILER_OPTIMIZATION_SIZE: y
+      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
+      CONFIG_ESPTOOLPY_FLASHSIZE_8MB: "y"
+      CONFIG_FREERTOS_HZ: "1000"
+      CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240: y
+      CONFIG_ESPTOOLPY_FLASHMODE_QIO: y
+      CONFIG_ESPTOOLPY_FLASHFREQ_120M: y
+      CONFIG_SPIRAM_MODE_OCT: y
+      CONFIG_IDF_EXPERIMENTAL_FEATURES: y
+      CONFIG_SPIRAM_SPEED_120M: y
+      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: y
+      CONFIG_SPIRAM_RODATA: y
+      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: y
+      CONFIG_COMPILER_OPTIMIZATION_PERF: y
+
+i2c:
+  sda: GPIO08
+  scl: GPIO09
+  scan: True
+  id: bus_a
+
+### IO Extender
+ch422g:
+  - id: ch422g_hub
+
+# Enable logging
+logger:
+  level: DEBUG
+#  logs:
+#    light: ERROR
+
+## Include shared functionallity
+<<: !include ./common/binary_sensor.yaml
+<<: !include ./common/button.yaml
+<<: !include ./common/connections.yaml
+<<: !include ./common/globals.yaml
+<<: !include ./common/sensor.yaml
+<<: !include ./common/text_sensor.yaml
+<<: !include ./common/time.yaml
+<<: !include ./common/scripts.yaml
+#<<: !include ./common/lights.yaml
+
+
+switch:
+  - platform: safe_mode
+    name: Use Safe Mode
+    id: device_safe_mode
+
+  - platform: gpio
+    id: lcdbacklight
+    name: lcdbacklight
+    pin:
+      ch422g: ch422g_hub
+      number: 2
+      mode:
+        output: true
+      inverted: false
+    restore_mode: ALWAYS_ON
+
+font:
+  # Regular fonts
+  - file: "gfonts://Roboto"
+    id: h1
+    size: 80
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file: "gfonts://Roboto"
+    id: h2
+    size: 55
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file: "gfonts://Roboto"
+    id: h3
+    size: 35
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  # Light Fonts
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h1_semi_bold
+    size: 80
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h2_semi_bold
+    size: 55
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h3_semi_bold
+    size: 35
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+
+# 800 x 480 pixels
+display:
+  - platform: rpi_dpi_rgb
+    id: displayid
+    update_interval: never
+    auto_clear_enabled: false
+    color_order: RGB
+    pclk_frequency: 16MHZ
+    dimensions:
+      width: 800
+      height: 480
+    de_pin:
+      number: 5
+    hsync_pin:
+      number: 46
+      ignore_strapping_warning: true
+    vsync_pin:
+      number: 3
+      ignore_strapping_warning: true
+    pclk_pin: 7
+    pclk_inverted: true
+    reset_pin:
+      ch422g: ch422g_hub
+      number: 3
+#    enable_pin:
+#      ch422g: ch422g_hub
+#      number: 2  
+    hsync_back_porch: 8
+    hsync_front_porch: 8
+    hsync_pulse_width: 4
+    vsync_back_porch: 16
+    vsync_front_porch: 16
+    vsync_pulse_width: 4
+    data_pins:
+      red:
+        - 1         #r3
+        - 2         #r4
+        - 42        #r5
+        - 41        #r6
+        - 40        #r7
+      blue:
+        - 14        #b3
+        - 38        #b4
+        - 18        #b5
+        - 17        #b6
+        - 10        #b7
+      green:
+        - 39        #g2
+        - 0         #g3
+        - 45        #g4
+        - 48        #g5
+        - 47        #g6
+        - 21        #g7
+    pages:
+      - id: page1
+        lambda: |-
+          // Get the screen dimensions
+          auto screenX = it.get_width();
+          auto screenY = it.get_height();
+          //ESP_LOGD("DISPLAY", "Screen dimensions: %dx%d", screenX, screenY);
+          // These should match the font sizes in the font definition above
+          int h1Size = 80;
+          int h2Size = 55;
+          int h3Size = 35;
+
+          int edgePadding = 20;
+          int intentPixels = 20;
+
+          std::string name = "${name}";
+
+          if(!name.empty()) {
+            name[0] = std::toupper(name[0]);
+          }
+
+          // Fill background
+          //it.fill(COLOR_ON);
+
+          Color TextColor = COLOR_ON;
+
+          // Show loading screen before data is received.
+          int yPosition = edgePadding;
+          // Print the room name:
+          it.printf(edgePadding, yPosition, id(h1_semi_bold), TextColor, name.c_str());
+          //
+          yPosition += h1Size;
+          // Print the date to the right of the room name:
+          it.strftime(edgePadding, yPosition, id(h3), TextColor, "%d/%m %Y", id(esptime).now());
+          //
+          int lineThickness = 4;
+          yPosition += h3Size + edgePadding; // 10 pixels between the date and the line
+          // Draw line under the room name and date: Coords are X Y then size X Y 
+          it.filled_rectangle(0, yPosition, screenX, lineThickness, TextColor);
+          yPosition += edgePadding;
+
+          if (id(initial_data_received) == false) {
+            it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "WAITING FOR DATA...");
+            ESP_LOGD("DISPLAY", "Waiting for data...");
+            return;
+          } else {
+
+            std::string jsonString = id(calevents).state;
+            DynamicJsonDocument doc(1024);
+            auto error = deserializeJson(doc, jsonString);
+
+            if (error) {
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "ERROR PARSING JSON");
+              return;
+            }
+
+            JsonArray bookings = doc.as<JsonArray>();
+            
+            // From here the bookings are filtered and only the upcoming ones are left.
+            if(bookings.size() == 0) {
+              it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, "No bookings today!");
+              ESP_LOGD("DISPLAY", "No upcoming events");
+            } else {
+              //ESP_LOGD("DISPLAY", "Filtered bookings found %d", bookings.size());
+              for (size_t i = 0; i < bookings.size() && i < 4; ++i) {
+                JsonObject booking = bookings[i];
+                std::string summary = booking["summary"].as<std::string>();
+                std::string start = booking["start"].as<std::string>();
+                std::string end = booking["end"].as<std::string>();
+                if (i == 0) {
+                  // Print the first booking name:
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, summary.c_str());
+                  yPosition += h2Size;
+                  it.printf(edgePadding, yPosition, id(h2_semi_bold), TextColor, (start + " - " + end).c_str());
+                  yPosition += h2Size;
+                } else {
+                  // Print the rest of the bookings:
+                  yPosition += h2Size;
+                  it.printf(edgePadding + intentPixels, yPosition, id(h3_semi_bold), TextColor, ("- " + start + " - " + end + " " + summary).c_str());
+                }
+              }
+            }
+          }
+
+### Touchscreen
+touchscreen:
+  platform: gt911
+  id: my_touch
+  interrupt_pin: GPIO4
+  reset_pin:
+    ch422g: ch422g_hub
+    number: 1
+    mode: OUTPUT
+  on_touch:
+    - lambda: |-
+        ESP_LOGI("Touch", "Touch detected at x=%d, y=%d", touch.x, touch.y);
+  on_update:
+    - lambda: |-
+          for (auto touch: touches)  {
+              if (touch.state <= 2) {
+                ESP_LOGI("Touch points:", "id=%d x=%d, y=%d x.raw=%d, y.raw=%d", touch.id, touch.x, touch.y, touch.x_raw, touch.y_raw);
+              }
+          }  
+#  on_release:
+#    then:
+#      - if:
+#          condition: lvgl.is_paused
+#          then:
+#            - lvgl.resume:
+#            - lvgl.widget.redraw:
