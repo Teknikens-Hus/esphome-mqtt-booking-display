@@ -73,6 +73,7 @@ logger:
 <<: !include ./common/text_sensor.yaml
 <<: !include ./common/time.yaml
 <<: !include ./common/scripts.yaml
+<<: !include ./common/fonts.yaml
 #<<: !include ./common/lights.yaml
 
 
@@ -92,61 +93,12 @@ switch:
       inverted: false
     restore_mode: ALWAYS_ON
 
-font:
-  # Regular fonts
-  - file: "gfonts://Roboto"
-    id: h1
-    size: 80
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-  - file: "gfonts://Roboto"
-    id: h2
-    size: 55
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-  - file: "gfonts://Roboto"
-    id: h3
-    size: 35
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-  # Light Fonts
-  - file:
-      type: gfonts
-      family: Roboto
-      weight: bold
-    id: h1_semi_bold
-    size: 80
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-  - file:
-      type: gfonts
-      family: Roboto
-      weight: bold
-    id: h2_semi_bold
-    size: 55
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-  - file:
-      type: gfonts
-      family: Roboto
-      weight: bold
-    id: h3_semi_bold
-    size: 35
-    extras:
-      file: "gfonts://Roboto"
-      glyphs: "ÅÄÖåäöÁÉáé"
-
 # 800 x 480 pixels
 display:
   - platform: rpi_dpi_rgb
     id: displayid
     update_interval: never
-    auto_clear_enabled: false
+    auto_clear_enabled: true
     color_order: RGB
     pclk_frequency: 16MHZ
     dimensions:
@@ -215,10 +167,25 @@ display:
             name[0] = std::toupper(name[0]);
           }
 
-          // Fill background
-          //it.fill(COLOR_ON);
+          Color TextColor = Color(255,255,255);
+          Color StatusColor = Color(255, 255, 255);
+          // A green color for the unoccupied rooms
+          Color UnOccupiedColor = Color(31, 160, 95);
+          // A red color for the occupied rooms
+          Color OccupiedColor = Color(227, 28, 74);
+          // A orange color for the rooms that are about to be occupied
+          Color AboutToOccupyColor = Color(240, 168, 54);
+          // Determine the color of the room based on the occupancy status
+          if (id(b_occupied).state) {
+            StatusColor = OccupiedColor;
+          } else if (id(b_occupied_soon).state) {
+            StatusColor = AboutToOccupyColor;
+          } else {
+            StatusColor = UnOccupiedColor;
+          }
 
-          Color TextColor = COLOR_ON;
+          // Fill background
+          it.fill(StatusColor);
 
           // Show loading screen before data is received.
           int yPosition = edgePadding;

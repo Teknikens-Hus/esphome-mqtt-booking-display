@@ -1,0 +1,54 @@
+font:
+  # Regular fonts
+  - file: "gfonts://Roboto"
+    id: h1
+    size: 80
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file: "gfonts://Roboto"
+    id: h2
+    size: 55
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file: "gfonts://Roboto"
+    id: h3
+    size: 35
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  # Light Fonts
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h1_semi_bold
+    size: 80
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h2_semi_bold
+    size: 55
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
+  - file:
+      type: gfonts
+      family: Roboto
+      weight: bold
+    id: h3_semi_bold
+    size: 35
+    bpp: 4
+    extras:
+      file: "gfonts://Roboto"
+      glyphs: "ÅÄÖåäöÁÉáé"
