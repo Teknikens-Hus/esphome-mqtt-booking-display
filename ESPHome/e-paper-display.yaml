@@ -59,7 +59,10 @@ font:
     id: h1_semi_bold
     size: 80
     extras:
-      file: "gfonts://Roboto"
+      file:
+        type: gfonts
+        family: Roboto
+        weight: bold
       glyphs: "ÅÄÖåäöÁÉáé"
   - file:
       type: gfonts
@@ -68,7 +71,10 @@ font:
     id: h2_semi_bold
     size: 55
     extras:
-      file: "gfonts://Roboto"
+      file:
+        type: gfonts
+        family: Roboto
+        weight: bold
       glyphs: "ÅÄÖåäöÁÉáé"
   - file:
       type: gfonts
@@ -77,7 +83,10 @@ font:
     id: h3_semi_bold
     size: 35
     extras:
-      file: "gfonts://Roboto"
+      file:
+        type: gfonts
+        family: Roboto
+        weight: bold
       glyphs: "ÅÄÖåäöÁÉáé"
 
 # 800 x 480 pixels
