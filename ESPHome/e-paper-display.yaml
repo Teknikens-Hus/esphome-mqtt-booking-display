@@ -6,6 +6,9 @@ substitutions:
 
 ## The board to use
 esp32:
+  variant: esp32
+  framework:
+    type: esp-idf
   board: nodemcu-32s
 
 # Enable logging
@@ -136,7 +139,7 @@ display:
           //
           yPosition += h1Size;
           // Print the date to the right of the room name:
-          it.strftime(edgePadding, yPosition, id(h3), TextColor, "%d/%m %Y", id(esptime).now());
+          it.strftime(edgePadding, yPosition, id(h3), TextColor, "%d/%m/%Y", id(esptime).now());
           //
           int lineThickness = 4;
           yPosition += h3Size + edgePadding; // 10 pixels between the date and the line
@@ -151,7 +154,7 @@ display:
           } else {
 
             std::string jsonString = id(calevents).state;
-            DynamicJsonDocument doc(1024);
+            JsonDocument doc;
             auto error = deserializeJson(doc, jsonString);
 
             if (error) {

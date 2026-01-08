@@ -3,7 +3,6 @@ light:
     rgb_order: GRB
     pin: GPIO27
     num_leds: 26
-    rmt_channel: 0
     chipset: WS2812
     name: "Occupied Light"
     id: occupied_light

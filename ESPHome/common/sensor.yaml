@@ -5,7 +5,11 @@ sensor:
     icon: mdi:wifi-strength-2
     internal: false
     update_interval: 120s
-    
+
+  - platform: uptime
+    type: timestamp
+    name: "Last Boot"
+  
   - platform: template
     name: Recorded Display Refresh
     accuracy_decimals: 0

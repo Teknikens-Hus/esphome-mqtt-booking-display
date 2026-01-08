@@ -16,7 +16,7 @@ script:
                 if (jsonString.empty()) {
                   return "None";
                 }
-                DynamicJsonDocument doc(1024);
+                JsonDocument doc;
                 auto error = deserializeJson(doc, jsonString);
                 if (error) {
                   ESP_LOGD("Start Time", "Error parsing JSON");
@@ -37,7 +37,7 @@ script:
                 if (jsonString.empty()) {
                   return "None";
                 }
-                DynamicJsonDocument doc(1024);
+                JsonDocument doc;
                 auto error = deserializeJson(doc, jsonString);
                 if (error) {
                   ESP_LOGD("End Time", "Error parsing JSON");

@@ -13,6 +13,10 @@ text_sensor:
       id: macaddress
       icon: mdi:chip
 
+  - platform: version
+    name: "ESPHome Version"
+    hide_timestamp: true
+    
   - platform: mqtt_subscribe
     name: "Upcoming Calendar Events"
     id: calevents
