@@ -36,7 +36,7 @@ The python program helps you create this interactively if you prefer, so you don
 
 
 ## ESPHome version
-This project is built using ESPHome version 2024.10.2
+This project is built using ESPHome version 2026.4.1
 
 ## Substitutions
 This project uses substitutions to make it easier to install the same code on multiple devices. The following substitutions are used:

@@ -3,7 +3,7 @@ import json
 import sys
 import serial.tools.list_ports
 
-esphomeVersion = "Version: 2025.12.5"
+esphomeVersion = "Version: 2026.4.4"
 config_file = "config.json"
 
 def install_new_devices():
